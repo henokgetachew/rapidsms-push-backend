@@ -54,10 +54,13 @@ class PushBackend(BackendBase):
                 raise ValueError("You are missing required config parameter: %s" % key)
         self.sendsms_params = sendsms_params
 
-    def send(self, message):
-        self.info('Sending message: %s' % message)
-        params = {"text": escape(message.text),
-                  "number": message.connection.identity}
+    def send(self, id_, text, identities, context):
+        self.info('Sending message: %s' % text)
+        self.info('identity: %s' % identities[0])
+        
+        params = {"text": escape(text),
+                  "number": identities[0],
+                 }
         params.update(self.sendsms_params)
         # this is ghetto xml parsing but we control all the inputs so 
         # we're comfortable with that.
