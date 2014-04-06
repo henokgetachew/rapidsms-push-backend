@@ -1,6 +1,9 @@
 from django import forms
 
-from threadless_router.backends.http.forms import BaseHttpForm
+class BaseHttpForm(forms.Form):
+
+    def get_incoming_data(self):
+        raise NotImplementedError()
 
 
 class PushForm(BaseHttpForm):

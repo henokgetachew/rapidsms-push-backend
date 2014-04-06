@@ -1,7 +1,7 @@
 from xml.sax.saxutils import escape
 import urllib2
 
-from threadless_router.backends.base import BackendBase
+from rapidsms.backends.base import BackendBase
 
 class PushBackend(BackendBase):
     """

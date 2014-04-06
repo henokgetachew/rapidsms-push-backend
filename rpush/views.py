@@ -1,9 +1,16 @@
-from threadless_router.backends.http.views import BaseHttpBackendView
-from threadless_router.celery.tasks import IncomingTask
 from rpush.forms import PushForm
 from lxml import etree
 from django.http import QueryDict, HttpRequest, HttpResponse
 
+from rapidsms.backends.http.views import BaseHttpBackendView
+from rapidsms.router.celery import CeleryRouter 
+from rapidsms.models import Backend
+from rapidsms.messages import IncomingMessage
+
+import logging
+import datetime
+
+logger=logging.getLogger(__name__)
 
 class PushBackendView(BaseHttpBackendView):
     """ Backend view for handling inbound SMSes from Kannel """
@@ -12,8 +19,16 @@ class PushBackendView(BaseHttpBackendView):
     form_class = PushForm
 
     def form_valid(self, form):
-        self.debug('form is valid')
-        IncomingTask.delay(self.backend_name, **form.get_incoming_data())
+        logger.debug('form is valid')
+
+        incoming_data = form.get_incoming_data()
+        backend, _ = Backend.objects.get_or_create(name=self.backend_name)
+        connection, _ = backend.connection_set.get_or_create(identity=incoming_data['identity'], backend=backend)
+        message = IncomingMessage([connection,], incoming_data['text'], datetime.datetime.now())
+
+        router = CeleryRouter()
+        response = router.receive_incoming(message)
+
         return HttpResponse('OK')
 
 
