@@ -3,7 +3,7 @@ from lxml import etree
 from django.http import QueryDict, HttpRequest, HttpResponse
 
 from rapidsms.backends.http.views import BaseHttpBackendView
-from rapidsms.router.celery import CeleryRouter 
+from rapidsms.router import get_router 
 from rapidsms.models import Backend
 from rapidsms.messages import IncomingMessage
 
@@ -26,7 +26,7 @@ class PushBackendView(BaseHttpBackendView):
         connection, _ = backend.connection_set.get_or_create(identity=incoming_data['identity'], backend=backend)
         message = IncomingMessage([connection,], incoming_data['text'], datetime.datetime.now())
 
-        router = CeleryRouter()
+        router = get_router()
         response = router.receive_incoming(message)
 
         return HttpResponse('OK')
