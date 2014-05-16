@@ -3,14 +3,15 @@ from lxml import etree
 from django.http import QueryDict, HttpRequest, HttpResponse
 
 from rapidsms.backends.http.views import BaseHttpBackendView
-from rapidsms.router import get_router 
+from rapidsms.router.celery import CeleryRouter
 from rapidsms.models import Backend
 from rapidsms.messages import IncomingMessage
 
 import logging
 import datetime
 
-logger=logging.getLogger(__name__)
+logger = logging.getLogger(__name__)
+
 
 class PushBackendView(BaseHttpBackendView):
     """ Backend view for handling inbound SMSes from Kannel """
@@ -24,9 +25,9 @@ class PushBackendView(BaseHttpBackendView):
         incoming_data = form.get_incoming_data()
         backend, _ = Backend.objects.get_or_create(name=self.backend_name)
         connection, _ = backend.connection_set.get_or_create(identity=incoming_data['identity'], backend=backend)
-        message = IncomingMessage([connection,], incoming_data['text'], datetime.datetime.now())
+        message = IncomingMessage([connection, ], incoming_data['text'], datetime.datetime.now())
 
-        router = get_router()
+        router = CeleryRouter()
         response = router.receive_incoming(message)
 
         return HttpResponse('OK')
