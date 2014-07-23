@@ -1,0 +1,32 @@
+<methodCall>
+  <methodName>EAPIGateway.SendSMS</methodName>
+  <params>
+    <param>
+    <value>
+      <struct>
+        <member>
+          <name>Password</name>
+          <value>{{password}}</value>
+        </member>
+        <member>
+          <name>Channel</name>
+          <value><int>{{channel}}</int></value>
+        </member>
+        <member>
+          <name>Service</name>
+          <value><int>{{service}}</int>
+          </value>
+        </member>
+        <member>
+          <name>SMSText</name>
+          <value>{{text}}</value>
+        </member>
+        <member>
+          <name>Numbers</name>
+          <value>{{number}}</value>
+        </member>
+      </struct>
+    </value>
+    </param>
+  </params>
+</methodCall>
